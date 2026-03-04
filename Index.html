@@ -1382,18 +1382,11 @@ function toast(msg){document.getElementById('toast-msg').textContent=msg;const t
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 (function init(){
-  S.fields=[
-    mkF('text'),
-    {...mkF('text'),id:gid(),label:'Last Name',placeholder:'Enter your last name'},
-    mkF('email'),mkF('phone'),
-    {...mkF('select'),id:gid(),label:'How did you hear about us?',options:['Web Search','Social Media','Referral','Advertisement','Other']},
-    mkF('textarea'),
-    {...mkF('checkbox'),id:gid(),label:'I consent to receive marketing communications'},
-    mkF('submit'),
-  ];
+     
   render();selF(S.fields[0].id);
 })();
 </script>
 </body>
 
 </html>
+
