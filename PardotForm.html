@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pardot Form Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-deep:#0a0c10;--bg-panel:#0f1117;--bg-hover:#1a1e2a;--bg-active:#1f2436;--border:#1f2436;--border-light:#262c3d;--accent:#00c9a7;--accent-dim:rgba(0,201,167,0.12);--danger:#ff4d6d;--text-primary:#e2e6f0;--text-secondary:#8892a4;--text-muted:#4a5268;--radius-sm:5px;--shadow:0 4px 24px rgba(0,0,0,0.4);--transition:0.18s ease;--font-ui:'DM Sans',sans-serif;--font-display:'Syne',sans-serif;--font-mono:'DM Mono',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-ui);background:var(--bg-deep);color:var(--text-primary);font-size:13px;line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+
+#header{height:52px;background:var(--bg-panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:12px;z-index:100;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text-primary)}
+.logo .badge{background:linear-gradient(135deg,#00c9a7,#5b8dee);color:#fff;font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:99px;text-transform:uppercase}
+.sep{flex:1}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);font-family:var(--font-ui);font-size:12px;font-weight:500;cursor:pointer;border:none;transition:var(--transition);white-space:nowrap}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-light)}
+.btn-ghost:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--text-muted)}
+.btn-accent{background:linear-gradient(135deg,#00c9a7,#00a896);color:#fff;box-shadow:0 3px 12px rgba(0,201,167,.3)}
+.btn-accent:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(0,201,167,.45)}
+.btn-red{background:linear-gradient(135deg,#ff4d6d,#e63956);color:#fff}
+.btn-red:hover{transform:translateY(-1px)}
+.btn svg{width:14px;height:14px;flex-shrink:0}
+.count-badge{background:var(--bg-active);color:var(--text-muted);font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
+
+#app{display:flex;height:calc(100vh - 52px);overflow:hidden}
+
+#left-panel{width:192px;flex-shrink:0;background:var(--bg-panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.panel-hdr{padding:13px 14px 8px;font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted)}
+.palette{padding:4px 8px 16px;overflow-y:auto;flex:1}
+.pal-group{margin-bottom:14px}
+.pal-group-title{font-size:9.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text-muted);padding:0 6px;margin-bottom:4px}
+.pal-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:var(--radius-sm);cursor:grab;border:1px solid transparent;transition:var(--transition);user-select:none;margin-bottom:2px;color:var(--text-secondary);font-size:12px}
+.pal-item:hover{background:var(--bg-hover);border-color:var(--border-light);color:var(--text-primary)}
+.pal-item:active{cursor:grabbing;transform:scale(.97)}
+.pal-item.dragging-src{opacity:.4}
+.pi{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pi svg{width:12px;height:12px}
+.pi-text{background:#1a2436;color:#5b8dee}.pi-email{background:#1a2430;color:#00c9a7}.pi-phone{background:#1f2030;color:#a78bfa}
+.pi-number{background:#201e30;color:#fb923c}.pi-select{background:#1a2a28;color:#34d399}.pi-checkbox{background:#1a1f2e;color:#60a5fa}
+.pi-radio{background:#221a2a;color:#e879f9}.pi-textarea{background:#1e2028;color:#94a3b8}.pi-submit{background:#1a2420;color:#4ade80}.pi-heading{background:#201e1a;color:#fbbf24}.pi-divider{background:#1a1e28;color:#7c8a9e}.pi-column{background:#1a2436;color:#5b8dee}
+
+/* UNIFIED CANVAS */
+#canvas-area{flex:1;overflow:hidden;display:flex;flex-direction:column;background:#edf0f7;min-width:0}
+#canvas-hint{background:#e2e6f1;border-bottom:1px solid #d0d7e6;padding:6px 16px;font-size:11px;color:#6b7591;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.canvas-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:28px 24px 60px;display:flex;justify-content:center;align-items:flex-start}
+
+#form-card{background:#fff;border-radius:10px;box-shadow:0 2px 20px rgba(0,0,0,.10),0 0 0 1px rgba(0,0,0,.06);width:100%;max-width:660px;min-height:100%;padding:32px 36px 40px;position:relative;display:flex;flex-direction:column}
+#form-card.dragover-card{box-shadow:0 2px 20px rgba(0,201,167,.2),0 0 0 2px rgba(0,201,167,.45)}
+
+.form-title{width:100%;border:none;background:transparent;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:700;color:#1a2035;outline:none;padding:4px 2px;border-bottom:2px solid transparent;margin-bottom:20px;transition:border-color .15s;cursor:text}
+.form-title:focus{border-bottom-color:#5b8dee}
+.form-title::placeholder{color:#c0cad8;font-weight:400}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:12px;color:#b0bcd0;text-align:center;pointer-events:none;flex:1}
+.empty-icon{width:64px;height:64px;border:2px dashed #c8d3e6;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.empty-icon svg{width:28px;height:28px;color:#c8d3e6}
+.empty-state h3{font-size:15px;font-weight:600;color:#9aa5ba}
+.empty-state p{font-size:12.5px;max-width:220px}
+
+#drop-zone{flex:1;display:flex;flex-direction:column}
+.dz{height:4px;border-radius:3px;margin:2px 0;transition:all .15s}
+.dz.active{height:34px;background:rgba(0,201,167,.07);border:2px dashed rgba(0,201,167,.5);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.dz.active::after{content:'Drop here';font-size:10.5px;color:#00c9a7;font-weight:600}
+
+.fw{position:relative;border-radius:6px;margin:1px 0;padding:10px 12px 9px;border:2px solid transparent;transition:border-color .14s,background .14s;cursor:pointer}
+.fw:hover{border-color:#d4ddf0;background:#f8faff}
+.fw.sel{border-color:#5b8dee;background:#f3f7ff;box-shadow:0 0 0 4px rgba(91,141,238,.09)}
+.fbar{position:absolute;top:-1px;right:-1px;display:none;gap:2px;background:#fff;border:1px solid #d0d9ec;border-radius:6px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:20}
+.fw:hover .fbar,.fw.sel .fbar{display:flex}
+.fa{width:24px;height:24px;border:none;background:transparent;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#6b7591;transition:all .14s}
+.fa:hover{background:#f0f3fa;color:#1a2035}
+.fa.del:hover{background:#fff0f2;color:#e63956}
+.fa svg{width:11px;height:11px}
+.dh{position:absolute;top:50%;left:-16px;transform:translateY(-50%);cursor:grab;color:#ccd4e4;opacity:0;transition:opacity .14s}
+.fw:hover .dh{opacity:1}
+.dh svg{width:11px;height:11px}
+
+/* COLUMN STYLES */
+.column-container{display:flex;gap:16px;margin:8px 0;width:100%;flex-wrap:wrap}
+.column{flex:1;min-width:200px;position:relative;border-radius:6px;transition:all .14s;background:rgba(0,0,0,0.02);border:1px dashed var(--border-light);padding:8px}
+.column .fw{margin:2px 0}
+.column.droppable{border:2px dashed rgba(0,201,167,.5);background:rgba(0,201,167,.02)}
+.column-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:0 4px}
+.column-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted)}
+.column-remove{width:20px;height:20px;border:none;background:transparent;border-radius:4px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0.6}
+.column-remove:hover{background:var(--danger);color:#fff;opacity:1}
+.column .fbar{right:-1px;top:-1px}
+.empty-col{min-height:60px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:11px;border:1px dashed var(--border-light);border-radius:4px;margin:4px 0;cursor:default}
+.column-controls{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+.column-controls button{padding:4px 8px;background:var(--bg-deep);border:1px solid var(--border-light);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:10px;cursor:pointer;transition:var(--transition)}
+.column-controls button:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* FORM FIELD STYLES - identical to real Pardot output */
+.pf-label{display:block;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:600;color:#333;margin-bottom:5px;line-height:1.4}
+.pf-req{color:#e63956;margin-left:3px}
+.pf-input,.pf-select,.pf-textarea{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#555;background:#fff;border:1px solid #ccc;border-radius:3px;padding:7px 10px;display:block;pointer-events:none}
+.pf-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Cpath fill='%23666' d='M5.5 7.5L1 3h9z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.pf-textarea{resize:none;height:72px;overflow:auto}
+.pf-check-row,.pf-radio-row{display:flex;align-items:center;gap:8px;margin:3px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#555}
+.pf-check-row input,.pf-radio-row input{pointer-events:none;flex-shrink:0}
+.pf-submit{display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:600;color:#fff;background:#0066cc;border:none;border-radius:3px;padding:9px 24px;cursor:default}
+.pf-submit-wrapper{display:flex;width:100%;margin-top:8px}
+.pf-submit-wrapper.left{justify-content:flex-start}
+.pf-submit-wrapper.center{justify-content:center}
+.pf-submit-wrapper.right{justify-content:flex-end}
+.pf-heading{font-family:Arial,Helvetica,sans-serif;font-size:19px;font-weight:700;color:#1a2035;padding:4px 0 2px}
+.pf-divider{border:none;border-top:1px solid #dde3ee;margin:6px 0}
+
+#right-panel{width:360px;flex-shrink:0;background:var(--bg-panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.ptabs{display:flex;border-bottom:1px solid var(--border);padding:0 8px;gap:2px}
+.ptab{padding:11px 11px 9px;font-size:12px;font-weight:500;color:var(--text-muted);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;transition:var(--transition);font-family:var(--font-ui);margin-bottom:-1px}
+.ptab:hover{color:var(--text-secondary)}
+.ptab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.pcontent{flex:1;overflow-y:auto;padding:12px 12px 24px}
+.psec{margin-bottom:15px}
+.psec-t{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.prow{margin-bottom:8px}
+.plbl{display:block;font-size:11px;font-weight:500;color:var(--text-secondary);margin-bottom:3px}
+.pinput,.pselect{width:100%;padding:6px 9px;background:var(--bg-deep);border:1px solid var(--border-light);border-radius:var(--radius-sm);color:var(--text-primary);font-size:11.5px;font-family:var(--font-ui);outline:none;transition:border-color var(--transition)}
+.pinput:focus,.pselect:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,201,167,.1)}
+.pselect{appearance:none;cursor:pointer}
+.pcrow{display:flex;gap:7px;align-items:center}
+.pcrow .pinput{flex:1}
+.swatch{width:30px;height:30px;border-radius:5px;border:2px solid var(--border-light);cursor:pointer;flex-shrink:0;overflow:hidden;position:relative}
+.swatch input[type="color"]{position:absolute;inset:0;width:100%;height:100%;border:none;padding:0;cursor:pointer;opacity:0}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:2px 0}
+.tog-lbl{font-size:11.5px;color:var(--text-secondary)}
+.tog{width:34px;height:19px;background:var(--bg-active);border-radius:99px;position:relative;cursor:pointer;border:1px solid var(--border-light);transition:var(--transition);flex-shrink:0}
+.tog.on{background:var(--accent);border-color:var(--accent)}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;background:#fff;border-radius:99px;transition:transform .18s ease}
+.tog.on::after{transform:translateX(15px)}
+.opt-list{display:flex;flex-direction:column;gap:4px}
+.opt-row{display:flex;gap:5px;align-items:center}
+.opt-row .pinput{flex:1}
+.opt-del{width:22px;height:22px;flex-shrink:0;background:transparent;border:1px solid var(--border-light);border-radius:4px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.opt-del:hover{background:rgba(255,77,109,.1);border-color:var(--danger);color:var(--danger)}
+.opt-del svg{width:9px;height:9px}
+.add-opt{display:flex;align-items:center;gap:5px;padding:6px 9px;border:1px dashed var(--border-light);border-radius:var(--radius-sm);background:transparent;color:var(--text-muted);font-size:11px;cursor:pointer;width:100%;transition:var(--transition);font-family:var(--font-ui);margin-top:6px}
+.add-opt:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.add-opt svg{width:11px;height:11px}
+.width-unit-row{display:flex;gap:4px;margin-top:4px}
+.width-unit-btn{flex:1;padding:4px 0;background:var(--bg-deep);border:1px solid var(--border-light);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:10px;font-weight:600;cursor:pointer;text-align:center;transition:var(--transition)}
+.width-unit-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.align-btn-group{display:flex;gap:4px;margin-top:4px}
+.align-btn{flex:1;padding:6px 0;background:var(--bg-deep);border:1px solid var(--border-light);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:11px;cursor:pointer;text-align:center;transition:var(--transition)}
+.align-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.align-btn svg{width:12px;height:12px;display:inline-block;vertical-align:middle}
+.pslider{width:100%;accent-color:var(--accent);height:4px;cursor:pointer;margin-top:4px}
+.type-badge{display:inline-block;background:var(--bg-hover);color:var(--text-muted);font-size:9px;padding:2px 6px;border-radius:99px;margin-left:6px;text-transform:uppercase}
+.no-sel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px;text-align:center;gap:8px;color:var(--text-muted)}
+.no-sel svg{width:34px;height:34px;opacity:.35}
+.no-sel p{font-size:11.5px;max-width:160px}
+.selection-hint{background:var(--accent-dim);color:var(--accent);padding:6px 12px;border-radius:var(--radius-sm);font-size:11px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.selection-hint svg{width:14px;height:14px}
+
+.overlay{position:fixed;inset:0;background:rgba(5,6,10,.86);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);animation:fIn .2s ease}
+@keyframes fIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--bg-panel);border:1px solid var(--border-light);border-radius:12px;box-shadow:var(--shadow);width:760px;max-width:calc(100vw - 40px);max-height:calc(100vh - 60px);display:flex;flex-direction:column;animation:sUp .22s ease;overflow:hidden}
+@keyframes sUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhdr{display:flex;align-items:flex-start;padding:15px 18px;border-bottom:1px solid var(--border);gap:10px}
+.mtitle{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text-primary);line-height:1.3}
+.msub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.mclose{width:28px;height:28px;border:none;background:var(--bg-hover);border-radius:6px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:var(--transition);flex-shrink:0;margin-left:auto}
+.mclose:hover{background:var(--bg-active);color:var(--text-primary)}
+.mclose svg{width:13px;height:13px}
+.modal-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 18px;gap:0;flex-shrink:0}
+.modal-tab{padding:9px 14px 8px;font-size:12px;font-weight:500;color:var(--text-muted);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;transition:var(--transition);font-family:var(--font-ui);margin-bottom:-1px}
+.modal-tab:hover{color:var(--text-secondary)}
+.modal-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.code-area{flex:1;overflow:auto;padding:20px;background:#080b11}
+.code-block{font-family:var(--font-mono);font-size:11.5px;line-height:1.75;color:#abb2c0;white-space:pre;margin:0}
+.mfoot{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;align-items:center}
+.copy-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;background:var(--bg-hover);border:1px solid var(--border-light);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:11.5px;cursor:pointer;font-family:var(--font-ui);transition:var(--transition)}
+.copy-btn:hover{background:var(--bg-active);color:var(--text-primary)}
+.copy-btn.copied{color:var(--accent);border-color:var(--accent)}
+.copy-btn svg{width:12px;height:12px}
+#toast{position:fixed;bottom:20px;right:20px;background:#1a2436;border:1px solid var(--border-light);border-left:3px solid var(--accent);border-radius:8px;padding:11px 16px;font-size:12.5px;color:var(--text-primary);box-shadow:var(--shadow);z-index:9999;display:flex;align-items:center;gap:9px;transform:translateY(80px);opacity:0;transition:all .3s ease}
+#toast.show{transform:translateY(0);opacity:1}
+.ti{width:16px;height:16px;border-radius:50%;background:rgba(0,201,167,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="header">
+  <div class="logo">
+    Pardot Form Builder 
+  </div>
+  <div class="sep"></div>
+  <div class="header-actions">
+    <span id="count-badge" class="count-badge">0 fields</span>
+    <button class="btn btn-ghost" onclick="openModal()">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M4 4l-3 3 3 3M10 4l3 3-3 3M8 2l-2 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Export CSS
+    </button>
+    <button class="btn btn-red" onclick="clearAll()">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Clear
+    </button>
+  </div>
+</div>
+<div id="app">
+  <div id="left-panel">
+    <div class="panel-hdr">Fields</div>
+    <div class="palette">
+      <div class="pal-group">
+        <div class="pal-group-title">Input</div>
+        <div class="pal-item" draggable="true" data-type="text"><div class="pi pi-text"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M7 4v7M4 11h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>Text Field</div>
+        <div class="pal-item" draggable="true" data-type="email"><div class="pi pi-email"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 4.5l6 4 6-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>Email</div>
+        <div class="pal-item" draggable="true" data-type="phone"><div class="pi pi-phone"><svg viewBox="0 0 14 14" fill="none"><path d="M3 2h3l1 3-2 1c.6 1.4 1.6 2.4 3 3l1-2 3 1v3c0 1-4 2-8-2S2 3 3 2z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Phone</div>
+        <div class="pal-item" draggable="true" data-type="number"><div class="pi pi-number"><svg viewBox="0 0 14 14" fill="none"><path d="M3 2v10M3 7h8M11 2v10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>Number</div>
+        <div class="pal-item" draggable="true" data-type="textarea"><div class="pi pi-textarea"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 5h7M3.5 7.5h7M3.5 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>Textarea</div>
+      </div>
+      <div class="pal-group">
+        <div class="pal-group-title">Choice</div>
+        <div class="pal-item" draggable="true" data-type="select"><div class="pi pi-select"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M9 7h2M10.5 6l1.5 1-1.5 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 7h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>Dropdown</div>
+        <div class="pal-item" draggable="true" data-type="checkbox"><div class="pi pi-checkbox"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Checkbox</div>
+        <div class="pal-item" draggable="true" data-type="radio"><div class="pi pi-radio"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="2.5" fill="currentColor"/></svg></div>Radio Group</div>
+      </div>
+      <div class="pal-group">
+        <div class="pal-group-title">Layout</div>
+        <div class="pal-item" draggable="true" data-type="column"><div class="pi pi-column"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="12" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1" width="5" height="12" rx="1" stroke="currentColor" stroke-width="1.2"/></svg></div>2 Columns</div>
+        <div class="pal-item" draggable="true" data-type="submit"><div class="pi pi-submit"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="12" height="6" rx="2" fill="currentColor" opacity=".15"/><rect x="1" y="4" width="12" height="6" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7h5M7.5 5.5L9 7l-1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Submit</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="canvas-area">
+    <div id="canvas-hint">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v2.5M6 8.5V11M1 6h2.5M8.5 6H11M2.5 2.5l1.8 1.8M7.7 7.7l1.8 1.8M2.5 9.5l1.8-1.8M7.7 4.3l1.8-1.8" stroke="#8892a4" stroke-width="1.1" stroke-linecap="round"/></svg>
+      <span>Drop fields onto the form — what you see here is exactly how it will look. Click any field to edit.</span>
+    </div>
+    <div class="canvas-scroll">
+      <div id="form-card">
+        <div id="drop-zone"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="right-panel">
+    <div class="ptabs">
+      <button class="ptab on" id="tab-props" onclick="switchTab('props')">Field Props</button>
+      <button class="ptab" id="tab-styles" onclick="switchTab('styles')">Form Styles</button>
+    </div>
+    <div class="pcontent" id="pane-props">
+      <div class="no-sel" id="no-sel">
+        <svg viewBox="0 0 36 36" fill="none"><rect x="4" y="8" width="28" height="20" rx="4" stroke="currentColor" stroke-width="1.5"/><path d="M12 16h12M12 21h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <p>Click a field on the form to edit its properties</p>
+      </div>
+      <div id="props-body" style="display:none"></div>
+    </div>
+    <div class="pcontent" id="pane-styles" style="display:none"><div id="styles-body"></div></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="mhdr">
+      <div style="flex:1">
+        <div class="mtitle">Export Pardot Code</div>
+        <div class="msub" id="modal-sub">Uses official Pardot selectors. Paste inside &lt;style type="text/css"&gt; on your Pardot Landing Page or Layout Template.</div>
+      </div>
+      <button class="mclose" onclick="closeModal()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="mtab-css" onclick="switchModalTab('css')">CSS Code</button>
+      <button class="modal-tab" id="mtab-form" onclick="switchModalTab('form')">Form Code (Multi-Column)</button>
+    </div>
+    <div class="code-area"><pre class="code-block" id="css-out"></pre></div>
+    <div class="mfoot">
+      <span style="font-size:11px;color:var(--text-muted);flex:1" id="modal-info"></span>
+      <button class="copy-btn" id="copy-btn" onclick="copyCode()">
+        <svg viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 4V3a1 1 0 00-1-1H2a1 1 0 00-1 1v7a1 1 0 001 1h1" stroke="currentColor" stroke-width="1.2"/></svg>Copy
+      </button>
+      <button class="btn btn-accent" id="download-btn" onclick="downloadCode()">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M7 2v8M4 7l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Download
+      </button>
+    </div>
+  </div>
+</div>
+<div id="toast"><div class="ti"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span id="toast-msg"></span></div>
+<script>
+const S={fields:[],selId:null,dragFromPalette:false,dragSrcId:null,tab:'props',
+  typeStyles:{
+    text:{labelFontFamily:'Arial,Helvetica,sans-serif',labelMarginTop:'0',labelMarginBottom:'4',inputFontFamily:'Arial,Helvetica,sans-serif',inputColor:'#555555',inputBg:'#ffffff',inputBorder:'#cc0f0f',inputRadius:'20',inputPadding:'7',minHeight:'50'},
+    email:{labelFontFamily:'Arial,Helvetica,sans-serif',labelMarginTop:'0',labelMarginBottom:'4',inputFontFamily:'Arial,Helvetica,sans-serif',inputColor:'#555555',inputBg:'#ffffff',inputBorder:'#cc0f0f',inputRadius:'20',inputPadding:'7',minHeight:'50'},
+    phone:{labelFontFamily:'Arial,Helvetica,sans-serif',labelMarginTop:'0',labelMarginBottom:'4',inputFontFamily:'Arial,Helvetica,sans-serif',inputColor:'#555555',inputBg:'#ffffff',inputBorder:'#cc0f0f',inputRadius:'20',inputPadding:'7',minHeight:'50'},
+    number:{labelFontFamily:'Arial,Helvetica,sans-serif',labelMarginTop:'0',labelMarginBottom:'4',inputFontFamily:'Arial,Helvetica,sans-serif',inputColor:'#555555',inputBg:'#ffffff',inputBorder:'#cc0f0f',inputRadius:'20',inputPadding:'7',minHeight:'50'},
+    textarea:{labelFontFamily:'Arial,Helvetica,sans-serif',labelMarginTop:'0',labelMarginBottom:'4',inputFontFamily:'Arial,Helvetica,sans-serif',inputColor:'#555555',inputBg:'#ffffff',inputBorder:'#cc0f0f',inputRadius:'20',inputPadding:'7',minHeight:'85'},
+    select:{labelFontFamily:'Arial,Helvetica,sans-serif',labelMarginTop:'0',labelMarginBottom:'4',inputFontFamily:'Arial,Helvetica,sans-serif',inputColor:'#555555',inputBg:'#ffffff',inputBorder:'#cc0f0f',inputRadius:'20',inputPadding:'7',minHeight:'50'},
+    checkbox:{labelFontFamily:'Arial,Helvetica,sans-serif',labelMarginTop:'0',labelMarginBottom:'4',labelColor:'#333333'},
+    radio:{labelFontFamily:'Arial,Helvetica,sans-serif',labelMarginTop:'0',labelMarginBottom:'4',labelColor:'#333333'},
+    submit:{buttonBg:'#B63E1E',buttonColor:'#ffffff',buttonRadius:'0',buttonPaddingX:'35',buttonPaddingY:'13',buttonWidth:'auto',buttonWidthUnit:'px',buttonAlign:'left',buttonHoverBg:'#ffffff',buttonHoverColor:'#e84925',buttonFontSize:'20'},
+    heading:{fontFamily:'Arial,Helvetica,sans-serif',color:'#1a2035'},
+    divider:{},
+    column:{gap:'0',columnCount:2}
+  },
+  style:{fontSize:'14',color:'#666666',labelColor:'#777',labelFontSize:'14',labelFontWeight:'600',formWidth:'660',formWidthUnit:'px',formPadding:'10',formMarginTop:'0',formMarginBottom:'0',formBg:'#ffffff',reqColor:'#e84925',errorColor:'#e84925'}};
+let uid=1;const gid=()=>'f'+(uid++)+'_'+Date.now();
+const DEFS={text:{label:'First Name',placeholder:'Enter your first name'},email:{label:'Email Address',placeholder:'you@example.com',required:true},phone:{label:'Phone Number',placeholder:'+1 (555) 000-0000'},number:{label:'Number',placeholder:'0'},textarea:{label:'Message',placeholder:'Enter your message here...'},select:{label:'Country',options:['United States','United Kingdom','Canada','Australia','Other']},checkbox:{label:'I agree to the Terms of Service'},radio:{label:'Company Size',options:['1-10','11-50','51-200','200+']},submit:{label:'Submit'},heading:{label:'Section Title'},divider:{label:''},column:{}};
+
+function mkF(type){return{id:gid(),type,label:'',placeholder:'',required:false,defaultValue:'',options:[],width:'100',widthUnit:'%',...DEFS[type]};}
+
+// Global field map to track all fields including those in columns
+let allFieldsMap = new Map();
+
+function updateFieldsMap() {
+  allFieldsMap.clear();
+  S.fields.forEach(f => {
+    allFieldsMap.set(f.id, f);
+    if (f.type === 'column' && f.fields) {
+      f.fields.forEach(cf => allFieldsMap.set(cf.id, cf));
+    }
+  });
+}
+
+function getFieldById(id) {
+  return allFieldsMap.get(id);
+}
+
+function render(){
+  updateFieldsMap();
+  const dz=document.getElementById('drop-zone');
+  dz.innerHTML='';
+  if(S.fields.length===0){
+    dz.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 28 28" fill="none"><rect x="2" y="6" width="24" height="16" rx="4" stroke="currentColor" stroke-width="1.5"/><path d="M7 14h14M7 19h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><h3>Drop fields here to build your form</h3><p>Drag any field type from the left panel</p></div>';
+    bindEmptyDrop(dz);
+  }else{
+    S.fields.forEach((f,i)=>{dz.appendChild(mkDZ(i));dz.appendChild(mkFW(f));});
+    dz.appendChild(mkDZ(S.fields.length));
+  }
+  const card=document.getElementById('form-card');
+  card.style.background=S.style.formBg;
+  card.style.maxWidth=S.style.formWidth + S.style.formWidthUnit;
+  card.style.padding=S.style.formPadding+'px 20px';
+  card.style.marginTop=S.style.formMarginTop+'px';
+  card.style.marginBottom=S.style.formMarginBottom+'px';
+  document.getElementById('count-badge').textContent=allFieldsMap.size + ' field'+(allFieldsMap.size!==1?'s':'');
+  
+  // Restore selection after render
+  if(S.selId) {
+    setTimeout(() => {
+      document.querySelectorAll('.fw').forEach(el => {
+        if(el.dataset.id === S.selId) {
+          el.classList.add('sel');
+        }
+      });
+    }, 0);
+  }
+}
+
+function bindEmptyDrop(el){
+  el.addEventListener('dragover',e=>{e.preventDefault();document.getElementById('form-card').classList.add('dragover-card');});
+  el.addEventListener('dragleave',e=>{if(!el.contains(e.relatedTarget))document.getElementById('form-card').classList.remove('dragover-card');});
+  el.addEventListener('drop',e=>{e.preventDefault();document.getElementById('form-card').classList.remove('dragover-card');handleDrop(e,0);});
+}
+
+function mkDZ(idx){
+  const d=document.createElement('div');d.className='dz';d.dataset.i=idx;
+  d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('active');});
+  d.addEventListener('dragleave',()=>d.classList.remove('active'));
+  d.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();d.classList.remove('active');handleDrop(e,idx);});
+  return d;
+}
+
+function mkFW(f){
+  const w=document.createElement('div');
+  w.className='fw'+(S.selId===f.id?' sel':'');w.dataset.id=f.id;w.draggable=true;
+  
+  if(f.type === 'column') {
+    const dh=document.createElement('div');dh.className='dh';
+    dh.innerHTML='<svg viewBox="0 0 12 12" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="8" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="9" r="1" fill="currentColor"/><circle cx="8" cy="9" r="1" fill="currentColor"/></svg>';
+    w.appendChild(dh);
+    
+    const bar=document.createElement('div');bar.className='fbar';
+    bar.innerHTML=`<button class="fa" onclick="mvF('${f.id}',-1)"><svg viewBox="0 0 12 12" fill="none"><path d="M2 7.5l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="fa" onclick="mvF('${f.id}',1)"><svg viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="fa" onclick="dupF('${f.id}')"><svg viewBox="0 0 12 12" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4V2.5A1.5 1.5 0 002.5 1H1A1 1 0 000 2v6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button><button class="fa del" onclick="delF('${f.id}')"><svg viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>`;
+    w.appendChild(bar);
+    
+    const colContainer=document.createElement('div');colContainer.className='column-container';
+    colContainer.dataset.columnContainer = f.id;
+    const columnCount = S.typeStyles.column?.columnCount || 2;
+    colContainer.style.gap = (S.typeStyles.column?.gap || '0') + 'px';
+    
+    // Create columns
+    for(let i=0; i<columnCount; i++) {
+      const col=document.createElement('div');col.className='column';
+      col.dataset.columnId = f.id + '_col' + i;
+      col.dataset.columnIndex = i;
+      col.dataset.parentId = f.id;
+      
+      const colHeader=document.createElement('div');colHeader.className='column-header';
+      colHeader.innerHTML=`<span class="column-title">Column ${i+1}</span>
+        <button class="column-remove" onclick="removeColumnField('${f.id}', ${i}, event)"><svg viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2L2 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>`;
+      col.appendChild(colHeader);
+      
+      // Add drop zones and fields inside column
+      const colFields = f.fields ? f.fields.filter(cf => cf.columnIndex === i) : [];
+      if(colFields.length === 0) {
+        const emptyCol = document.createElement('div');emptyCol.className='empty-col';
+        emptyCol.innerHTML='Drop fields here';
+        emptyCol.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selF(f.id);
+        });
+        col.appendChild(emptyCol);
+      } else {
+        colFields.forEach((cf, idx) => {
+          col.appendChild(mkColDZ(f.id, i, idx));
+          col.appendChild(mkColFW(cf, f.id, i));
+        });
+        col.appendChild(mkColDZ(f.id, i, colFields.length));
+      }
+      
+      // Add drag and drop handlers for column
+      col.addEventListener('dragover', e=>{e.preventDefault();col.classList.add('droppable');});
+      col.addEventListener('dragleave', ()=>col.classList.remove('droppable'));
+      col.addEventListener('drop', e=>{e.preventDefault();e.stopPropagation();col.classList.remove('droppable');handleColumnDrop(e, f.id, i);});
+      
+      // Add click handler to column background (not on fields)
+      col.addEventListener('click', (e) => {
+        // Only select if clicking directly on the column div or empty-col
+        if (e.target === col || e.target.classList.contains('empty-col')) {
+          e.stopPropagation();
+          selF(f.id);
+        }
+      });
+      
+      colContainer.appendChild(col);
+    }
+    
+    // Add column controls
+    const colControls = document.createElement('div');colControls.className='column-controls';
+    colControls.innerHTML=`
+      <button onclick="addColumn('${f.id}')">+ Add Column</button>
+      <button onclick="removeColumn('${f.id}')">- Remove Column</button>
+    `;
+    colContainer.appendChild(colControls);
+    
+    w.appendChild(colContainer);
+    
+  } else {
+    const dh=document.createElement('div');dh.className='dh';
+    dh.innerHTML='<svg viewBox="0 0 12 12" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="8" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="9" r="1" fill="currentColor"/><circle cx="8" cy="9" r="1" fill="currentColor"/></svg>';
+    w.appendChild(dh);
+    
+    const bar=document.createElement('div');bar.className='fbar';
+    bar.innerHTML=`<button class="fa" onclick="mvF('${f.id}',-1)"><svg viewBox="0 0 12 12" fill="none"><path d="M2 7.5l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="fa" onclick="mvF('${f.id}',1)"><svg viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="fa" onclick="dupF('${f.id}')"><svg viewBox="0 0 12 12" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4V2.5A1.5 1.5 0 002.5 1H1A1 1 0 000 2v6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button><button class="fa del" onclick="delF('${f.id}')"><svg viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>`;
+    w.appendChild(bar);
+    
+    const body=document.createElement('div');body.innerHTML=fHTML(f);w.appendChild(body);
+  }
+  
+  w.addEventListener('click',e=>{
+    if(!e.target.closest('.fbar') && !e.target.closest('.column-remove') && !e.target.closest('.column-controls') && !e.target.closest('button')) {
+      selF(f.id);
+    }
+  });
+  
+  w.addEventListener('dragstart',e=>{
+    if(f.type !== 'column') {
+      S.dragSrcId=f.id;
+      S.dragFromPalette=false;
+      e.dataTransfer.effectAllowed='move';
+      setTimeout(()=>w.style.opacity='.45',0);
+    } else {
+      e.preventDefault();
+    }
+  });
+  
+  w.addEventListener('dragend',()=>{
+    w.style.opacity='';
+    S.dragSrcId=null;
+  });
+  
+  return w;
+}
+
+function mkColDZ(parentId, colIdx, fieldIdx){
+  const d=document.createElement('div');d.className='dz';d.dataset.parent=parentId;d.dataset.col=colIdx;d.dataset.idx=fieldIdx;
+  d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('active');});
+  d.addEventListener('dragleave',()=>d.classList.remove('active'));
+  d.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();d.classList.remove('active');handleColumnFieldDrop(e, parentId, colIdx, fieldIdx);});
+  return d;
+}
+
+function mkColFW(f, parentId, colIdx){
+  const w=document.createElement('div');
+  w.className='fw'+(S.selId===f.id?' sel':'');w.dataset.id=f.id;w.draggable=true;
+  w.dataset.parentId=parentId;w.dataset.columnIndex=colIdx;
+  
+  const dh=document.createElement('div');dh.className='dh';
+  dh.innerHTML='<svg viewBox="0 0 12 12" fill="none"><circle cx="4" cy="3" r="1" fill="currentColor"/><circle cx="8" cy="3" r="1" fill="currentColor"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="8" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="9" r="1" fill="currentColor"/><circle cx="8" cy="9" r="1" fill="currentColor"/></svg>';
+  w.appendChild(dh);
+  
+  const bar=document.createElement('div');bar.className='fbar';
+  bar.innerHTML=`<button class="fa" onclick="mvColF('${parentId}',${colIdx},'${f.id}',-1)"><svg viewBox="0 0 12 12" fill="none"><path d="M2 7.5l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="fa" onclick="mvColF('${parentId}',${colIdx},'${f.id}',1)"><svg viewBox="0 0 12 12" fill="none"><path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="fa" onclick="dupColF('${parentId}',${colIdx},'${f.id}')"><svg viewBox="0 0 12 12" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4V2.5A1.5 1.5 0 002.5 1H1A1 1 0 000 2v6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button><button class="fa del" onclick="delColF('${parentId}',${colIdx},'${f.id}')"><svg viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>`;
+  w.appendChild(bar);
+  
+  const body=document.createElement('div');body.innerHTML=fHTML(f);w.appendChild(body);
+  
+  w.addEventListener('click',e=>{
+    if(!e.target.closest('.fbar')) {
+      e.stopPropagation();
+      selF(f.id);
+    }
+  });
+  
+  w.addEventListener('dragstart',e=>{
+    S.dragSrcId=f.id;
+    S.dragFromPalette=false;
+    e.dataTransfer.effectAllowed='move';
+    setTimeout(()=>w.style.opacity='.45',0);
+  });
+  
+  w.addEventListener('dragend',()=>{
+    w.style.opacity='';
+    S.dragSrcId=null;
+  });
+  
+  return w;
+}
+
+function fHTML(f){
+  const st=S.style;
+  const ts=S.typeStyles[f.type]||{};
+  const widthVal = f.width + (f.widthUnit || '%');
+  
+  const labelStyle = `font-family:${ts.labelFontFamily||'Arial,Helvetica,sans-serif'};color:${ts.labelColor||st.labelColor};font-size:${st.labelFontSize}px;font-weight:${st.labelFontWeight||'600'};margin-top:${ts.labelMarginTop||'0'}px;margin-bottom:${ts.labelMarginBottom||'4'}px`;
+  const req=f.required?'<span class="pf-req">*</span>':'';
+  
+  switch(f.type){
+    case 'text':case 'email':case 'phone':case 'number':
+      const inputStyle = `font-family:${ts.inputFontFamily||'Arial,Helvetica,sans-serif'};color:${ts.inputColor||st.color};background:${ts.inputBg||'#ffffff'};border:2px solid ${ts.inputBorder||'#cc0f0f'};border-radius:${ts.inputRadius||'20'}px;padding:${ts.inputPadding||'7'}px;width:${widthVal};min-height:${ts.minHeight||'50'}px;box-sizing:border-box;margin-bottom:16px;`;
+      return `<label class="pf-label" style="${labelStyle}">${esc(f.label)}${req}</label><input class="pf-input" type="${f.type==='phone'?'tel':f.type}" placeholder="${esc(f.placeholder)}" style="${inputStyle}" readonly>`;
+    case 'textarea':
+      const taStyle = `font-family:${ts.inputFontFamily||'Arial,Helvetica,sans-serif'};color:${ts.inputColor||st.color};background:${ts.inputBg||'#ffffff'};border:1.5px solid ${ts.inputBorder||'#cc0f0f'};border-radius:${ts.inputRadius||'20'}px;padding:${ts.inputPadding||'7'}px;width:${widthVal};min-height:${ts.minHeight||'85'}px;height:70px;box-sizing:border-box;cursor:text;`;
+      return `<label class="pf-label" style="${labelStyle}">${esc(f.label)}${req}</label><textarea class="pf-textarea" placeholder="${esc(f.placeholder)}" style="${taStyle}" readonly></textarea>`;
+    case 'select':
+      const selStyle = `font-family:${ts.inputFontFamily||'Arial,Helvetica,sans-serif'};color:${ts.inputColor||st.color};background:${ts.inputBg||'#ffffff'};border:2px solid ${ts.inputBorder||'#cc0f0f'};border-radius:${ts.inputRadius||'20'}px;padding:${ts.inputPadding||'7'}px;width:${widthVal};min-height:${ts.minHeight||'50'}px;box-sizing:border-box;margin-bottom:16px;`;
+      return `<label class="pf-label" style="${labelStyle}">${esc(f.label)}${req}</label><select class="pf-select" style="${selStyle}"><option>-- Select --</option>${(f.options||[]).map(o=>'<option>'+esc(o)+'</option>').join('')}</select>`;
+    case 'checkbox':
+      return `<div class="pf-check-row"><input type="checkbox"><label style="font-family:${ts.labelFontFamily||'Arial,Helvetica,sans-serif'};color:${ts.labelColor||st.color};font-size:${st.fontSize}px">${esc(f.label)}${req}</label></div>`;
+    case 'radio':
+      return `<label class="pf-label" style="${labelStyle}">${esc(f.label)}${req}</label>${(f.options||[]).map((o,i)=>'<div class="pf-radio-row"><input type="radio"'+(i===0?' checked':'')+'><span style="font-family:'+(ts.labelFontFamily||'Arial,Helvetica,sans-serif')+';color:'+(ts.labelColor||st.color)+';font-size:'+st.fontSize+'px">'+esc(o)+'</span></div>').join('')}`;
+    case 'submit':
+      const btnWidth = ts.buttonWidth !== 'auto' ? ts.buttonWidth + ts.buttonWidthUnit : 'auto';
+      const btnStyle = `background:${ts.buttonBg||'#B63E1E'};color:${ts.buttonColor||'#ffffff'};border-color:${ts.buttonBg||'#B63E1E'};border-radius:${ts.buttonRadius||'0'}px;padding:${ts.buttonPaddingY||'13'}px ${ts.buttonPaddingX||'35'}px;font-family:'Arial,Helvetica,sans-serif';font-size:${ts.buttonFontSize||'20'}px;font-weight:450;line-height:1.4;text-align:center;white-space:nowrap;vertical-align:middle;margin:10px 0 0 0;border:1px solid transparent;margin-right:10px;margin-bottom:15px;letter-spacing:1px;outline:0;cursor:pointer;-webkit-appearance:none;display:inline-block;width:${btnWidth};`;
+      return `<div class="pf-submit-wrapper ${ts.buttonAlign||'left'}"><button class="pf-submit" style="${btnStyle}" onmouseover="this.style.color='${ts.buttonHoverColor||'#e84925'}';this.style.backgroundColor='${ts.buttonHoverBg||'#ffffff'}';this.style.borderColor='${ts.buttonHoverBg||'#ffffff'}';this.style.boxShadow='1px 1px 10px #ccc'" onmouseout="this.style.color='${ts.buttonColor||'#ffffff'}';this.style.backgroundColor='${ts.buttonBg||'#B63E1E'}';this.style.borderColor='${ts.buttonBg||'#B63E1E'}';this.style.boxShadow='none'">${esc(f.label||'Submit')}</button></div>`;
+    case 'heading':
+      return `<div class="pf-heading" style="font-family:${ts.fontFamily||'Arial,Helvetica,sans-serif'};color:${ts.color||st.labelColor};font-size:${(parseInt(st.labelFontSize)+6)}px">${esc(f.label)}</div>`;
+    case 'divider':
+      return '<hr class="pf-divider">';
+    default:return'';
+  }
+}
+
+function rfField(id){
+  const f = getFieldById(id);
+  if(!f) return;
+  const w = document.querySelector(`.fw[data-id="${id}"]`);
+  if(w){
+    const b = w.querySelector('div:last-child');
+    if(b && f.type !== 'column') b.innerHTML = fHTML(f);
+  }
+}
+
+document.querySelectorAll('.pal-item').forEach(el=>{
+  el.addEventListener('dragstart',e=>{S.dragFromPalette=true;S.dragSrcId=null;e.dataTransfer.setData('ftype',el.dataset.type);e.dataTransfer.effectAllowed='copy';el.classList.add('dragging-src');});
+  el.addEventListener('dragend',()=>el.classList.remove('dragging-src'));
+});
+
+const card=document.getElementById('form-card');
+card.addEventListener('dragover',e=>{e.preventDefault();if(S.fields.length===0)card.classList.add('dragover-card');});
+card.addEventListener('dragleave',e=>{if(!card.contains(e.relatedTarget))card.classList.remove('dragover-card');});
+card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('dragover-card');if(S.fields.length===0)handleDrop(e,0);});
+
+function handleDrop(e,idx){
+  if(S.dragFromPalette){
+    const type=e.dataTransfer.getData('ftype');if(!type)return;
+    if(type === 'column') {
+      const f={id:gid(),type:'column',fields:[]};
+      S.fields.splice(idx,0,f);
+    } else {
+      const f=mkF(type);
+      S.fields.splice(idx,0,f);
+    }
+    render();toast('Added '+(type==='column'?'Columns':type));
+  }else if(S.dragSrcId){
+    const si=S.fields.findIndex(x=>x.id===S.dragSrcId);if(si===-1)return;
+    const[moved]=S.fields.splice(si,1);S.fields.splice(Math.max(0,si<idx?idx-1:idx),0,moved);S.dragSrcId=null;
+    render();
+  }
+  S.dragFromPalette=false;
+}
+
+function handleColumnDrop(e, parentId, colIdx){
+  e.preventDefault();e.stopPropagation();
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(!parent) return;
+  if(!parent.fields) parent.fields = [];
+  
+  if(S.dragFromPalette){
+    const type=e.dataTransfer.getData('ftype');if(!type||type==='column') return;
+    const f=mkF(type);f.columnIndex=colIdx;
+    parent.fields.push(f);
+    render();selF(f.id);toast('Added: '+f.label);
+  } else if(S.dragSrcId){
+    const sourceField = getFieldById(S.dragSrcId);
+    if(sourceField && sourceField.type!=='column'){
+      // Remove from original location
+      if(sourceField.columnIndex !== undefined) {
+        // Field is in a column - remove from parent
+        const oldParent = S.fields.find(p => p.fields && p.fields.some(f => f.id === S.dragSrcId));
+        if(oldParent) {
+          oldParent.fields = oldParent.fields.filter(f => f.id !== S.dragSrcId);
+        }
+      } else {
+        S.fields = S.fields.filter(f=>f.id!==S.dragSrcId);
+      }
+      sourceField.columnIndex=colIdx;
+      parent.fields.push(sourceField);
+      S.dragSrcId=null;
+      render();selF(sourceField.id);
+    }
+  }
+  S.dragFromPalette=false;
+}
+
+function handleColumnFieldDrop(e, parentId, colIdx, fieldIdx){
+  e.preventDefault();e.stopPropagation();
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(!parent||!parent.fields) return;
+  
+  if(S.dragFromPalette){
+    const type=e.dataTransfer.getData('ftype');if(!type||type==='column') return;
+    const f=mkF(type);f.columnIndex=colIdx;
+    parent.fields.splice(fieldIdx,0,f);
+    render();selF(f.id);toast('Added: '+f.label);
+  } else if(S.dragSrcId){
+    const sourceIndex = parent.fields.findIndex(f=>f.id===S.dragSrcId);
+    if(sourceIndex!==-1){
+      const[moved]=parent.fields.splice(sourceIndex,1);
+      parent.fields.splice(Math.max(0,sourceIndex<fieldIdx?fieldIdx-1:fieldIdx),0,moved);
+      S.dragSrcId=null;
+      render();selF(moved.id);
+    }
+  }
+  S.dragFromPalette=false;
+}
+
+function addColumn(parentId) {
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(!parent) return;
+  const currentCount = S.typeStyles.column?.columnCount || 2;
+  if(currentCount >= 6) return;
+  S.typeStyles.column = S.typeStyles.column || {};
+  S.typeStyles.column.columnCount = currentCount + 1;
+  render();toast('Added column');
+}
+
+function removeColumn(parentId) {
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(!parent) return;
+  const currentCount = S.typeStyles.column?.columnCount || 2;
+  if(currentCount <= 1) return;
+  
+  // Move fields from last column to previous column
+  const lastColIdx = currentCount - 1;
+  if(parent.fields) {
+    parent.fields = parent.fields.map(f => {
+      if(f.columnIndex === lastColIdx) {
+        f.columnIndex = lastColIdx - 1;
+      }
+      return f;
+    });
+  }
+  
+  S.typeStyles.column.columnCount = currentCount - 1;
+  render();toast('Removed column');
+}
+
+function removeColumnField(parentId, colIdx, e){
+  e.stopPropagation();
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(!parent||!parent.fields) return;
+  const fieldsInCol = parent.fields.filter(f=>f.columnIndex===colIdx);
+  if(fieldsInCol.length>0){
+    const lastField = fieldsInCol[fieldsInCol.length-1];
+    if(S.selId === lastField.id) S.selId = null;
+    parent.fields = parent.fields.filter(f=>f.id!==lastField.id);
+    render();
+    toast('Field removed from column');
+  }
+}
+
+function mvColF(parentId, colIdx, fieldId, dir){
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(!parent||!parent.fields) return;
+  const i=parent.fields.findIndex(f=>f.id===fieldId);
+  if(i<0) return;
+  const ni=i+dir;
+  if(ni<0||ni>=parent.fields.length) return;
+  [parent.fields[i], parent.fields[ni]]=[parent.fields[ni], parent.fields[i]];
+  render();selF(fieldId);
+}
+
+function dupColF(parentId, colIdx, fieldId){
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(!parent||!parent.fields) return;
+  const i=parent.fields.findIndex(f=>f.id===fieldId);
+  if(i<0) return;
+  const c=JSON.parse(JSON.stringify(parent.fields[i]));
+  c.id=gid();c.columnIndex=colIdx;
+  parent.fields.splice(i+1,0,c);
+  render();selF(c.id);toast('Duplicated');
+}
+
+function delColF(parentId, colIdx, fieldId){
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(!parent||!parent.fields) return;
+  parent.fields = parent.fields.filter(f=>f.id!==fieldId);
+  if(S.selId===fieldId){S.selId=null;noSel();}
+  render();toast('Field deleted');
+}
+
+function selF(id){
+  S.selId=id;
+  document.querySelectorAll('.fw').forEach(el=>el.classList.toggle('sel',el.dataset.id===id));
+  renderProps(id);
+  if(S.tab!=='props')switchTab('props');
+}
+
+function delF(id){
+  const f = getFieldById(id);
+  if(!f) return;
+  
+  if(f.columnIndex !== undefined) {
+    // Field is in a column
+    const parent = S.fields.find(p => p.fields && p.fields.some(cf => cf.id === id));
+    if(parent) {
+      parent.fields = parent.fields.filter(cf => cf.id !== id);
+    }
+  } else {
+    S.fields = S.fields.filter(x => x.id !== id);
+  }
+  
+  if(S.selId===id){S.selId=null;noSel();}
+  render();toast('Field deleted');
+}
+
+function mvF(id,dir){
+  const i=S.fields.findIndex(x=>x.id===id);
+  if(i<0 || S.fields[i].type==='column') return;
+  const ni=i+dir;
+  if(ni<0||ni>=S.fields.length) return;
+  [S.fields[i], S.fields[ni]]=[S.fields[ni], S.fields[i]];
+  render();selF(id);
+}
+
+function dupF(id){
+  const i=S.fields.findIndex(x=>x.id===id);
+  if(i<0 || S.fields[i].type==='column') return;
+  const c=JSON.parse(JSON.stringify(S.fields[i]));
+  c.id=gid();
+  S.fields.splice(i+1,0,c);
+  render();selF(c.id);toast('Duplicated');
+}
+
+function clearAll(){
+  if(!S.fields.length) return;
+  if(!confirm('Clear all fields?')) return;
+  S.fields=[];S.selId=null;noSel();render();toast('Cleared');
+}
+
+function noSel(){document.getElementById('no-sel').style.display='flex';document.getElementById('props-body').style.display='none';}
+
+function renderProps(id){
+  const f = getFieldById(id);
+  if(!f) return noSel();
+  
+  document.getElementById('no-sel').style.display='none';
+  const el=document.getElementById('props-body');el.style.display='block';
+  const ts=S.typeStyles[f.type]||{};
+  
+  let h=``;
+  
+  // Add selection hint
+  h+=`<div class="selection-hint">
+    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" fill="currentColor"/></svg>
+    Editing: ${f.type.charAt(0).toUpperCase()+f.type.slice(1)} ${f.label ? '- ' + f.label : ''}
+  </div>`;
+  
+  h+=`<div style="display:flex;align-items:center;margin-bottom:12px"><span class="psec-t" style="margin:0;border:none;flex:1">${f.type.charAt(0).toUpperCase()+f.type.slice(1)} Settings</span><span class="type-badge">${f.type}</span></div>`;
+  
+  if(f.type!=='divider' && f.type!=='column'){
+    h+='<div class="psec">';
+    if(f.type!=='submit')h+=`<div class="prow"><label class="plbl">Label</label><input class="pinput" type="text" value="${esc(f.label)}" oninput="setF('${id}','label',this.value)"></div>`;
+    if(['text','email','phone','number','textarea'].includes(f.type))h+=`<div class="prow"><label class="plbl">Placeholder</label><input class="pinput" type="text" value="${esc(f.placeholder)}" oninput="setF('${id}','placeholder',this.value)"></div>`;
+    if(['text','email','phone','number','textarea','select','checkbox','radio'].includes(f.type))h+=`<div class="prow"><div class="tog-row"><span class="tog-lbl">Required</span><div class="tog ${f.required?'on':''}" onclick="togReq('${id}')"></div></div></div>`;
+    h+='</div>';
+  }
+
+  if(f.type==='column'){
+    h+=`<div class="psec"><div class="psec-t">Column Settings</div>`;
+    h+=`<div class="prow"><label class="plbl">Number of Columns</label><input class="pinput" type="number" min="1" max="6" value="${ts.columnCount||2}" oninput="setColumnCount('${f.id}',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Gap between columns (px)</label><input class="pinput" type="number" min="0" max="40" value="${ts.gap||'0'}" oninput="setColumnGap('${f.id}',this.value)"></div>`;
+    h+=`</div>`;
+  }
+
+  h+='<div class="psec"><div class="psec-t">Styling</div>';
+  
+  if(['text','email','phone','number','textarea','select'].includes(f.type)){
+    h+=`<div class="prow"><label class="plbl">Label Font Family</label><select class="pselect" onchange="setTypeStyle('${f.type}','labelFontFamily',this.value)">${['Arial,Helvetica,sans-serif','Georgia,serif','Verdana,Geneva,sans-serif','Trebuchet MS,sans-serif','Times New Roman,serif','Courier New,monospace'].map(ff=>'<option value="'+ff+'"'+(ts.labelFontFamily===ff?' selected':'')+'>'+ff.split(',')[0]+'</option>').join('')}</select></div>`;
+    h+=`<div class="prow"><label class="plbl">Input Font Family</label><select class="pselect" onchange="setTypeStyle('${f.type}','inputFontFamily',this.value)">${['Arial,Helvetica,sans-serif','Georgia,serif','Verdana,Geneva,sans-serif','Trebuchet MS,sans-serif','Times New Roman,serif','Courier New,monospace'].map(ff=>'<option value="'+ff+'"'+(ts.inputFontFamily===ff?' selected':'')+'>'+ff.split(',')[0]+'</option>').join('')}</select></div>`;
+    h+=`<div class="prow"><label class="plbl">Text Color</label><div class="pcrow"><input class="pinput" type="text" value="${ts.inputColor||S.style.color}" oninput="setTypeStyle('${f.type}','inputColor',this.value)"><div class="swatch" style="background:${ts.inputColor||S.style.color}"><input type="color" value="${ts.inputColor||S.style.color}" oninput="setTypeStyle('${f.type}','inputColor',this.value)"></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Background</label><div class="pcrow"><input class="pinput" type="text" value="${ts.inputBg||'#ffffff'}" oninput="setTypeStyle('${f.type}','inputBg',this.value)"><div class="swatch" style="background:${ts.inputBg||'#ffffff'}"><input type="color" value="${ts.inputBg||'#ffffff'}" oninput="setTypeStyle('${f.type}','inputBg',this.value)"></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Border Color</label><div class="pcrow"><input class="pinput" type="text" value="${ts.inputBorder||'#cc0f0f'}" oninput="setTypeStyle('${f.type}','inputBorder',this.value)"><div class="swatch" style="background:${ts.inputBorder||'#cc0f0f'}"><input type="color" value="${ts.inputBorder||'#cc0f0f'}" oninput="setTypeStyle('${f.type}','inputBorder',this.value)"></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Border Radius (px)</label><input class="pinput" type="number" min="0" max="20" value="${ts.inputRadius||'20'}" oninput="setTypeStyle('${f.type}','inputRadius',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Padding (px)</label><input class="pinput" type="number" min="2" max="20" value="${ts.inputPadding||'7'}" oninput="setTypeStyle('${f.type}','inputPadding',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Min Height (px)</label><input class="pinput" type="number" min="30" max="200" value="${ts.minHeight||'50'}" oninput="setTypeStyle('${f.type}','minHeight',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Label Margin Top (px)</label><input class="pinput" type="number" min="0" max="60" value="${ts.labelMarginTop||'0'}" oninput="setTypeStyle('${f.type}','labelMarginTop',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Label Margin Bottom (px)</label><input class="pinput" type="number" min="0" max="60" value="${ts.labelMarginBottom||'4'}" oninput="setTypeStyle('${f.type}','labelMarginBottom',this.value)"></div>`;
+  }
+  
+  if(['checkbox','radio'].includes(f.type)){
+    h+=`<div class="prow"><label class="plbl">Label Font Family</label><select class="pselect" onchange="setTypeStyle('${f.type}','labelFontFamily',this.value)">${['Arial,Helvetica,sans-serif','Georgia,serif','Verdana,Geneva,sans-serif','Trebuchet MS,sans-serif','Times New Roman,serif','Courier New,monospace'].map(ff=>'<option value="'+ff+'"'+(ts.labelFontFamily===ff?' selected':'')+'>'+ff.split(',')[0]+'</option>').join('')}</select></div>`;
+    h+=`<div class="prow"><label class="plbl">Label Color</label><div class="pcrow"><input class="pinput" type="text" value="${ts.labelColor||S.style.color}" oninput="setTypeStyle('${f.type}','labelColor',this.value)"><div class="swatch" style="background:${ts.labelColor||S.style.color}"><input type="color" value="${ts.labelColor||S.style.color}" oninput="setTypeStyle('${f.type}','labelColor',this.value)"></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Label Margin Top (px)</label><input class="pinput" type="number" min="0" max="60" value="${ts.labelMarginTop||'0'}" oninput="setTypeStyle('${f.type}','labelMarginTop',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Label Margin Bottom (px)</label><input class="pinput" type="number" min="0" max="60" value="${ts.labelMarginBottom||'4'}" oninput="setTypeStyle('${f.type}','labelMarginBottom',this.value)"></div>`;
+  }
+  
+  if(f.type==='submit'){
+    h+=`<div class="prow"><label class="plbl">Button Width</label><div class="pcrow"><input class="pinput" type="text" value="${ts.buttonWidth||'auto'}" oninput="setTypeStyle('submit','buttonWidth',this.value)" placeholder="auto"><div style="width:60px"><select class="pselect" onchange="setTypeStyle('submit','buttonWidthUnit',this.value)"><option value="px" ${(ts.buttonWidthUnit||'px')==='px'?'selected':''}>px</option><option value="%" ${ts.buttonWidthUnit==='%'?'selected':''}>%</option></select></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Background</label><div class="pcrow"><input class="pinput" type="text" value="${ts.buttonBg||'#B63E1E'}" oninput="setTypeStyle('submit','buttonBg',this.value)"><div class="swatch" style="background:${ts.buttonBg||'#B63E1E'}"><input type="color" value="${ts.buttonBg||'#B63E1E'}" oninput="setTypeStyle('submit','buttonBg',this.value)"></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Text Color</label><div class="pcrow"><input class="pinput" type="text" value="${ts.buttonColor||'#ffffff'}" oninput="setTypeStyle('submit','buttonColor',this.value)"><div class="swatch" style="background:${ts.buttonColor||'#ffffff'}"><input type="color" value="${ts.buttonColor||'#ffffff'}" oninput="setTypeStyle('submit','buttonColor',this.value)"></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Hover Background</label><div class="pcrow"><input class="pinput" type="text" value="${ts.buttonHoverBg||'#ffffff'}" oninput="setTypeStyle('submit','buttonHoverBg',this.value)"><div class="swatch" style="background:${ts.buttonHoverBg||'#ffffff'}"><input type="color" value="${ts.buttonHoverBg||'#ffffff'}" oninput="setTypeStyle('submit','buttonHoverBg',this.value)"></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Hover Text Color</label><div class="pcrow"><input class="pinput" type="text" value="${ts.buttonHoverColor||'#e84925'}" oninput="setTypeStyle('submit','buttonHoverColor',this.value)"><div class="swatch" style="background:${ts.buttonHoverColor||'#e84925'}"><input type="color" value="${ts.buttonHoverColor||'#e84925'}" oninput="setTypeStyle('submit','buttonHoverColor',this.value)"></div></div></div>`;
+    h+=`<div class="prow"><label class="plbl">Font Size (px)</label><input class="pinput" type="number" min="12" max="32" value="${ts.buttonFontSize||'20'}" oninput="setTypeStyle('submit','buttonFontSize',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Border Radius (px)</label><input class="pinput" type="number" min="0" max="50" value="${ts.buttonRadius||'0'}" oninput="setTypeStyle('submit','buttonRadius',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Padding Horizontal (px)</label><input class="pinput" type="number" min="4" max="50" value="${ts.buttonPaddingX||'35'}" oninput="setTypeStyle('submit','buttonPaddingX',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Padding Vertical (px)</label><input class="pinput" type="number" min="4" max="30" value="${ts.buttonPaddingY||'13'}" oninput="setTypeStyle('submit','buttonPaddingY',this.value)"></div>`;
+    h+=`<div class="prow"><label class="plbl">Alignment</label><div class="align-btn-group"><button class="align-btn ${(ts.buttonAlign||'left')==='left'?'active':''}" onclick="setTypeStyle('submit','buttonAlign','left')">Left</button><button class="align-btn ${ts.buttonAlign==='center'?'active':''}" onclick="setTypeStyle('submit','buttonAlign','center')">Center</button><button class="align-btn ${ts.buttonAlign==='right'?'active':''}" onclick="setTypeStyle('submit','buttonAlign','right')">Right</button></div></div>`;
+  }
+  
+  if(f.type==='heading'){
+    h+=`<div class="prow"><label class="plbl">Font Family</label><select class="pselect" onchange="setTypeStyle('heading','fontFamily',this.value)">${['Arial,Helvetica,sans-serif','Georgia,serif','Verdana,Geneva,sans-serif','Trebuchet MS,sans-serif','Times New Roman,serif','Courier New,monospace'].map(ff=>'<option value="'+ff+'"'+(ts.fontFamily===ff?' selected':'')+'>'+ff.split(',')[0]+'</option>').join('')}</select></div>`;
+    h+=`<div class="prow"><label class="plbl">Color</label><div class="pcrow"><input class="pinput" type="text" value="${ts.color||S.style.labelColor}" oninput="setTypeStyle('heading','color',this.value)"><div class="swatch" style="background:${ts.color||S.style.labelColor}"><input type="color" value="${ts.color||S.style.labelColor}" oninput="setTypeStyle('heading','color',this.value)"></div></div></div>`;
+  }
+  
+  h+='</div>';
+
+  if(['select','radio'].includes(f.type)){
+    h+=`<div class="psec"><div class="psec-t">Options</div><div class="opt-list">${(f.options||[]).map((o,i)=>`<div class="opt-row"><input class="pinput" type="text" value="${esc(o)}" oninput="setOpt('${id}',${i},this.value)"><button class="opt-del" onclick="delOpt('${id}',${i})"><svg viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2L2 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button></div>`).join('')}</div><button class="add-opt" onclick="addOpt('${id}')"><svg viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Add Option</button></div>`;
+  }
+
+  if(['text','email','phone','number','textarea','select'].includes(f.type)){
+    h+=`<div class="psec"><div class="psec-t">Width</div><div class="prow"><label class="plbl" id="wl_${id}">Width: <strong style="color:var(--accent)">${f.width}${f.widthUnit||'%'}</strong></label><input type="range" min="20" max="100" step="5" value="${f.width||100}" class="pslider" oninput="setWidthValue('${id}',this.value);document.getElementById('wl_${id}').innerHTML='Width: <strong style=\\'color:var(--accent)\\'>'+this.value+(f.widthUnit||'%')+'</strong>'"></div><div class="width-unit-row"><button class="width-unit-btn ${(!f.widthUnit || f.widthUnit==='%')?'active':''}" onclick="setWidthUnit('${id}','%')">%</button><button class="width-unit-btn ${f.widthUnit==='px'?'active':''}" onclick="setWidthUnit('${id}','px')">px</button></div></div>`;
+  }
+
+  el.innerHTML=h;
+}
+
+function setColumnCount(parentId, count) {
+  const val = parseInt(count);
+  if(val < 1 || val > 6) return;
+  S.typeStyles.column = S.typeStyles.column || {};
+  S.typeStyles.column.columnCount = val;
+  
+  const parent = S.fields.find(f=>f.id===parentId);
+  if(parent && parent.fields) {
+    // Adjust column indices for existing fields
+    parent.fields = parent.fields.map(f => {
+      if(f.columnIndex >= val) {
+        f.columnIndex = val - 1;
+      }
+      return f;
+    });
+  }
+  
+  render();toast(`Columns set to ${val}`);
+}
+
+function setColumnGap(parentId, gap) {
+  S.typeStyles.column = S.typeStyles.column || {};
+  S.typeStyles.column.gap = gap;
+  const container = document.querySelector(`.fw[data-id="${parentId}"] .column-container`);
+  if(container) container.style.gap = gap + 'px';
+}
+
+function setWidthValue(id,val){const f=getFieldById(id);if(!f)return;f.width=val;rfField(id);}
+function setWidthUnit(id,unit){const f=getFieldById(id);if(!f)return;f.widthUnit=unit;renderProps(id);rfField(id);}
+function setF(id,prop,val){const f=getFieldById(id);if(!f)return;f[prop]=val;rfField(id);}
+function setTypeStyle(type,prop,val){S.typeStyles[type]=S.typeStyles[type]||{};S.typeStyles[type][prop]=val;S.fields.forEach(f=>{if(f.type===type)rfField(f.id);if(f.type==='column' && f.fields){f.fields.forEach(cf=>{if(cf.type===type)rfField(cf.id);});}});renderProps(S.selId);}
+function togReq(id){const f=getFieldById(id);if(!f)return;f.required=!f.required;renderProps(id);rfField(id);}
+function addOpt(id){const f=getFieldById(id);if(!f)return;f.options.push('Option '+(f.options.length+1));renderProps(id);rfField(id);}
+function setOpt(id,i,v){const f=getFieldById(id);if(!f)return;f.options[i]=v;rfField(id);}
+function delOpt(id,i){const f=getFieldById(id);if(!f)return;f.options.splice(i,1);renderProps(id);rfField(id);}
+
+function renderStyles(){
+  const st=S.style;
+  const cr=(l,k,s)=>`<div class="prow"><label class="plbl">${l}</label><div class="pcrow"><input class="pinput" type="text" value="${st[k]}" oninput="setSt('${k}',this.value);syncSw('${s}',this.value)"><div class="swatch" style="background:${st[k]}"><input type="color" value="${st[k]}" id="${s}" oninput="setSt('${k}',this.value);syncTxt('${s}',this.value)"></div></div></div>`;
+  
+  document.getElementById('styles-body').innerHTML=`<div class="psec"><div class="psec-t">Global Form Styles</div><div class="prow"><label class="plbl">Font Size (px)</label><input class="pinput" type="number" min="10" max="24" value="${st.fontSize}" oninput="setSt('fontSize',this.value)"></div>${cr('Text Color','color','sw_c')}${cr('Label Color','labelColor','sw_lc')}<div class="prow"><label class="plbl">Label Font Size (px)</label><input class="pinput" type="number" min="10" max="24" value="${st.labelFontSize}" oninput="setSt('labelFontSize',this.value)"></div><div class="prow"><label class="plbl">Label Font Weight</label><select class="pselect" onchange="setSt('labelFontWeight',this.value)"><option value="300" ${st.labelFontWeight==='300'?'selected':''}>Light (300)</option><option value="400" ${st.labelFontWeight==='400'?'selected':''}>Normal (400)</option><option value="500" ${st.labelFontWeight==='500'?'selected':''}>Medium (500)</option><option value="600" ${st.labelFontWeight==='600'?'selected':''}>Semi-Bold (600)</option><option value="700" ${st.labelFontWeight==='700'?'selected':''}>Bold (700)</option><option value="800" ${st.labelFontWeight==='800'?'selected':''}>Extra-Bold (800)</option></select></div></div><div class="psec"><div class="psec-t">Form Layout</div><div class="prow"><label class="plbl">Max Width</label><div class="pcrow"><input class="pinput" type="number" min="300" max="1200" value="${parseInt(st.formWidth)}" oninput="setSt('formWidth',this.value)"><div style="width:60px"><select class="pselect" onchange="setSt('formWidthUnit',this.value)"><option value="px" ${st.formWidthUnit==='px'?'selected':''}>px</option><option value="%" ${st.formWidthUnit==='%'?'selected':''}>%</option></select></div></div></div><div class="prow"><label class="plbl">Padding (px)</label><input class="pinput" type="number" min="0" max="80" value="${st.formPadding}" oninput="setSt('formPadding',this.value)"></div>${cr('Background','formBg','sw_fb')}</div><div class="psec"><div class="psec-t">Validation</div>${cr('Required Star','reqColor','sw_rq')}${cr('Error Color','errorColor','sw_er')}</div>`;
+}
+
+function setSt(k,v){
+  S.style[k]=v;
+  S.fields.forEach(f=>{if(f.type!=='column')rfField(f.id);if(f.type==='column' && f.fields){f.fields.forEach(cf=>rfField(cf.id));}});
+  const c=document.getElementById('form-card');
+  c.style.background=S.style.formBg;
+  c.style.maxWidth=S.style.formWidth + S.style.formWidthUnit;
+  c.style.padding=S.style.formPadding+'px 20px';
+  c.style.marginTop=S.style.formMarginTop+'px';
+  c.style.marginBottom=S.style.formMarginBottom+'px';
+}
+
+function syncSw(sid,val){const e=document.getElementById(sid);if(e&&/^#[0-9a-fA-F]{6}$/.test(val)){e.value=val;e.parentElement.style.background=val;}}
+function syncTxt(sid,val){const e=document.getElementById(sid);if(e){const t=e.parentElement.previousElementSibling;if(t)t.value=val;e.parentElement.style.background=val;}}
+
+function switchTab(t){
+  S.tab=t;
+  document.getElementById('tab-props').classList.toggle('on',t==='props');
+  document.getElementById('tab-styles').classList.toggle('on',t==='styles');
+  document.getElementById('pane-props').style.display=t==='props'?'block':'none';
+  document.getElementById('pane-styles').style.display=t==='styles'?'block':'none';
+  if(t==='styles')renderStyles();
+}
+
+function getUsedFieldTypes() {
+  const types = new Set();
+  S.fields.forEach(f => {
+    if(f.type === 'column' && f.fields) {
+      f.fields.forEach(cf => types.add(cf.type));
+    } else if(f.type !== 'column') {
+      types.add(f.type);
+    }
+  });
+  return types;
+}
+
+function genCSS(){
+  const st  = S.style;
+  const ts  = S.typeStyles;
+  const used = getUsedFieldTypes();
+
+  /* Which field groups are present */
+  const hasTextInput = ['text','email','phone','number'].some(t => used.has(t));
+  const hasSelect    = used.has('select');
+  const hasTextarea  = used.has('textarea');
+  const hasCheckbox  = used.has('checkbox');
+  const hasRadio     = used.has('radio');
+  const hasSubmit    = used.has('submit');
+  const hasColumns   = S.fields.some(f => f.type === 'column');
+  const hasRequired  = [...allFieldsMap.values()].some(f => f.required);
+
+  /* Per-type style shortcuts */
+  const txt  = ts.text     || {};
+  const sel  = ts.select   || {};
+  const ta   = ts.textarea || {};
+  const cb   = ts.checkbox || {};
+  const rad  = ts.radio    || {};
+  const sub  = ts.submit   || {};
+
+  /* Build type list for comment */
+  const typeLabels = [];
+  if(hasTextInput) typeLabels.push('text inputs');
+  if(hasSelect)    typeLabels.push('dropdown');
+  if(hasTextarea)  typeLabels.push('textarea');
+  if(hasCheckbox)  typeLabels.push('checkbox');
+  if(hasRadio)     typeLabels.push('radio');
+  if(hasSubmit)    typeLabels.push('submit');
+  if(hasColumns)   typeLabels.push('columns');
+
+
+  
+  let css =
+  
+  `<style type="text/css">
+/* ============================================================
+   Pardot Form CSS  —  PardotBuilder
+   Field types: ${typeLabels.length ? typeLabels.join(', ') : '(none)'}
+   Paste inside <style type="text/css"> on your Pardot page
+   ============================================================ */
+
+/* ── Form wrapper ── */
+#pardot-form {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: ${st.fontSize}px;
+  color: ${st.color};
+  max-width: ${st.formWidth}${st.formWidthUnit};
+  margin: 0 auto;
+  padding: ${st.formPadding}px 20px;
+  margin-top: ${st.formMarginTop||'0'}px;
+  margin-bottom: ${st.formMarginBottom||'0'}px;
+  background: ${st.formBg};
+}
+
+/* ── Field paragraph wrappers ── */
+body form.form p {
+  margin-bottom: 10px;
+  clear: both;
+}`;
+
+  /* Labels — always included if any visible field exists */
+  if(hasTextInput || hasSelect || hasTextarea || hasRadio || hasCheckbox){
+    const lblFamily = txt.labelFontFamily || 'Arial,Helvetica,sans-serif';
+    css += `
+
+/* ── Labels ── */
+body form.form p label,
+#pardot-form .field-label {
+  color: ${st.labelColor};
+  font-family: ${lblFamily};
+  font-size: ${st.labelFontSize}px;
+  font-weight: ${st.labelFontWeight||'600'};
+  display: block;
+  line-height: 1.4;
+  margin-top: ${txt.labelMarginTop||'0'}px;
+  margin-bottom: ${txt.labelMarginBottom||'4'}px;
+}`;
+  }
+
+  /* Text / Email / Phone / Number */
+  if(hasTextInput){
+    css += `
+
+/* ── Text, Email, Phone, Number inputs ── */
+body form.form input.text {
+  font-family: ${txt.inputFontFamily||'Arial,Helvetica,sans-serif'};
+  font-size: ${st.fontSize}px;
+  color: ${txt.inputColor||st.color};
+  background-color: ${txt.inputBg||'#ffffff'};
+  border: 1px solid ${txt.inputBorder||'#cccccc'};
+  border-radius: ${txt.inputRadius||'3'}px;
+  padding: ${txt.inputPadding||'7'}px 10px;
+  min-height: ${txt.minHeight||'36'}px;
+  width: 100% !important;
+  box-sizing: border-box;
+  outline: 0;
+}`;
+  }
+
+  /* Select / Dropdown */
+  if(hasSelect){
+    css += `
+
+/* ── Dropdown (select) ── */
+body form.form select {
+  font-family: ${sel.inputFontFamily||'Arial,Helvetica,sans-serif'};
+  font-size: ${st.fontSize}px;
+  color: ${sel.inputColor||st.color};
+  background-color: ${sel.inputBg||'#ffffff'};
+  border: 1px solid ${sel.inputBorder||'#cccccc'};
+  border-radius: ${sel.inputRadius||'3'}px;
+  padding: ${sel.inputPadding||'7'}px 10px;
+  min-height: ${sel.minHeight||'36'}px;
+  width: 100% !important;
+  box-sizing: border-box;
+}`;
+  }
+
+  /* Textarea */
+  if(hasTextarea){
+    css += `
+
+/* ── Textarea ── */
+#pardot-form textarea.standard {
+  font-family: ${ta.inputFontFamily||'Arial,Helvetica,sans-serif'};
+  font-size: ${st.fontSize}px;
+  color: ${ta.inputColor||st.color};
+  background-color: ${ta.inputBg||'#ffffff'};
+  border: 1px solid ${ta.inputBorder||'#cccccc'};
+  border-radius: ${ta.inputRadius||'3'}px;
+  padding: ${ta.inputPadding||'7'}px 10px;
+  min-height: ${ta.minHeight||'85'}px;
+  height: 85px;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: text;
+  resize: vertical;
+  overflow: auto;
+}`;
+  }
+
+  /* Checkbox */
+  if(hasCheckbox){
+    css += `
+
+/* ── Checkbox ── */
+body form.form input[type="checkbox"] {
+  margin-right: 8px;
+  vertical-align: middle;
+  width: auto;
+  height: auto;
+}
+body form.form input[type="checkbox"] + label,
+body form.form p.checkbox label {
+  font-family: ${cb.labelFontFamily||'Arial,Helvetica,sans-serif'};
+  color: ${cb.labelColor||st.labelColor};
+  display: inline;
+  font-size: ${st.fontSize}px;
+}`;
+  }
+
+  /* Radio */
+  if(hasRadio){
+    css += `
+
+/* ── Radio ── */
+body form.form input[type="radio"] {
+  margin-right: 8px;
+  vertical-align: middle;
+  width: auto;
+}
+body form.form p.radio label,
+body form.form p.radio span {
+  font-family: ${rad.labelFontFamily||'Arial,Helvetica,sans-serif'};
+  color: ${rad.labelColor||st.labelColor};
+  font-size: ${st.fontSize}px;
+}`;
+  }
+
+  /* Required field markers — only if any field is marked required */
+  if(hasRequired){
+    css += `
+
+/* ── Required fields ── */
+body form.form p.required label::after {
+  content: ' *';
+  color: ${st.reqColor};
+}
+body form.form span.required {
+  color: ${st.reqColor};
+}`;
+  }
+
+  /* Error messages — always useful for Pardot validation */
+  if(hasTextInput || hasSelect || hasTextarea || hasCheckbox || hasRadio){
+    css += `
+
+/* ── Validation errors ── */
+body form.form p.error > label,
+body form.form p.error .field-label {
+  color: ${st.errorColor};
+}
+#pardot-form span.error,
+body form.form p span.error {
+  color: ${st.errorColor};
+  font-size: ${Math.max(11, parseInt(st.fontSize)-1)}px;
+  display: block;
+  margin-top: 3px;
+}
+#pardot-form p.error.no-label {
+  margin-left: 0px;
+}`;
+  }
+
+  /* Submit button */
+  if(hasSubmit){
+    const btnW   = (sub.buttonWidth && sub.buttonWidth!=='auto') ? sub.buttonWidth+(sub.buttonWidthUnit||'px') : 'auto';
+    const align  = sub.buttonAlign || 'left';
+    const textAlign = align === 'right' ? 'right' : align === 'center' ? 'center' : 'left';
+    css += `
+
+/* ── Submit button ── */
+body form.form p.submit {
+  margin-top: 16px;
+  text-align: ${textAlign};
+}
+body form.form p.submit input[type="submit"] {
+  background: ${sub.buttonBg||'#0066cc'};
+  color: ${sub.buttonColor||'#ffffff'};
+  border: 1px solid ${sub.buttonBg||'#0066cc'};
+  border-radius: ${sub.buttonRadius||'3'}px;
+  padding: ${sub.buttonPaddingY||'9'}px ${sub.buttonPaddingX||'24'}px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: ${sub.buttonFontSize||'14'}px;
+  font-weight: 600;
+  width: ${btnW};
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  outline: 0;
+  -webkit-appearance: none;
+  display: inline-block;
+  transition: background 0.2s, color 0.2s;
+}
+body form.form p.submit input[type="submit"]:hover {
+  background: ${sub.buttonHoverBg||'#ffffff'};
+  color: ${sub.buttonHoverColor||sub.buttonBg||'#0066cc'};
+  border-color: ${sub.buttonHoverBg||'#ffffff'};
+}`;
+  }
+
+  /* Column layout — always uses official Pardot form-col classes */
+  if(hasColumns){
+    const colCount = ts.column?.columnCount || 2;
+    const gap      = parseFloat(ts.column?.gap || 0);
+    /* Pardot uses float-based columns with fixed class names */
+    css += `
+
+/* ── Column layout ── */
+/* Clears floats after column rows */
+body form.form div.form-col-1,
+body form.form div.form-col-2,
+body form.form div.form-col-full {
+  box-sizing: border-box;
+}
+
+body form.form div.form-col-1 {
+  float: left !important;
+  clear: left !important;
+  width: 49% !important;
+  padding-left: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  padding-bottom: 10px;
+}
+
+body form.form div.form-col-2 {
+  float: right !important;
+  clear: right !important;
+  width: 49% !important;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  padding-bottom: 10px;
+}
+
+body form.form div.form-col-full {
+  width: 100%;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  padding-bottom: 10px;
+  clear: both;
+}`;
+
+    /* Generate extra column classes for 3+ columns */
+    if(colCount >= 3){
+      const colW = Math.floor((100 / colCount)) - 1;
+      for(let i = 3; i <= colCount; i++){
+        css += `
+
+body form.form div.form-col-${i} {
+  float: left !important;
+  width: ${colW}% !important;
+  padding-left: 0 !important;
+  padding-right: ${i < colCount ? '1' : '0'}% !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  padding-bottom: 10px;
+  box-sizing: border-box;
+}`;
+      }
+    }
+
+    /* Ensure inputs fill column width */
+    css += `
+
+/* Inputs fill column width */
+body form.form div.form-col-1 input.text,
+body form.form div.form-col-1 select,
+body form.form div.form-col-1 textarea.standard,
+body form.form div.form-col-2 input.text,
+body form.form div.form-col-2 select,
+body form.form div.form-col-2 textarea.standard {
+  width: 100% !important;
+  box-sizing: border-box;
+}`;
+  }
+
+  /* Dependent fields — REQUIRED: Pardot uses this for conditional logic */
+  css += `
+
+/* ── Dependent/conditional fields — DO NOT REMOVE ── */
+.dependentField {
+  display: none;
+}
+</style>
+
+<body>
+  <div class="form-container">
+    %%content%%
+  </div>
+<\/body>`;
+
+  return css;
+}
+let _modalTab = 'css';
+
+function openModal(){
+  _modalTab = 'css';
+  document.getElementById('mtab-css').classList.add('active');
+  document.getElementById('mtab-form').classList.remove('active');
+  document.getElementById('css-out').textContent = genCSS();
+  document.getElementById('modal-sub').textContent = 'CSS only — uses official Pardot selectors. Paste inside <style type="text/css"> on your Pardot Landing Page or Layout Template.';
+  document.getElementById('download-btn').innerHTML = '<svg viewBox="0 0 14 14" fill="none" style="width:14px;height:14px"><path d="M7 2v8M4 7l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Download .css';
+  const types = [...getUsedFieldTypes()];
+  document.getElementById('modal-info').textContent = allFieldsMap.size + ' field'+(allFieldsMap.size!==1?'s':'')+' \u00b7 '+types.join(', ');
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function switchModalTab(tab){
+  _modalTab = tab;
+  document.getElementById('mtab-css').classList.toggle('active', tab==='css');
+  document.getElementById('mtab-form').classList.toggle('active', tab==='form');
+  if(tab === 'css'){
+    document.getElementById('css-out').textContent = genCSS();
+    document.getElementById('modal-sub').textContent = 'CSS only — uses official Pardot selectors. Paste inside <style type="text/css"> on your Pardot Landing Page or Layout Template.';
+    document.getElementById('download-btn').innerHTML = '<svg viewBox="0 0 14 14" fill="none" style="width:14px;height:14px"><path d="M7 2v8M4 7l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Download .css';
+  } else {
+    document.getElementById('css-out').textContent = genFormCode();
+    document.getElementById('modal-sub').textContent = 'Complete HTML page template with multi-column layout. Use as your Pardot Landing Page template.';
+    document.getElementById('download-btn').innerHTML = '<svg viewBox="0 0 14 14" fill="none" style="width:14px;height:14px"><path d="M7 2v8M4 7l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Download .html';
+  }
+}
+
+function genFormCode(){
+  const css = genCSS();
+  // Strip the <style> wrapper and body snippet from the CSS output to get pure CSS
+  const styleOpen = '<style type="text/css">\n';
+  const bodySnippet = '\n<\\/body>';
+  let pureCSS = css;
+  if(pureCSS.startsWith(styleOpen)) pureCSS = pureCSS.slice(styleOpen.length);
+  const closeStyleIdx = pureCSS.lastIndexOf('</style>');
+  if(closeStyleIdx !== -1) pureCSS = pureCSS.slice(0, closeStyleIdx);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pardot Form</title>
+
+  <style type="text/css">
+${pureCSS}
+  </style>
+
+</head>
+
+<body>
+
+  <div class="form-container">
+    %%content%%
+  </div>
+
+<\/body>
+
+<\/html>`;
+}
+
+function closeModal(){document.getElementById('modal').style.display='none';}
+
+function copyCode(){
+  navigator.clipboard.writeText(document.getElementById('css-out').textContent).then(()=>{
+    const b=document.getElementById('copy-btn');b.classList.add('copied');
+    b.innerHTML='<svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px"><path d="M2 7l3.5 3.5L12 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Copied!';
+    setTimeout(()=>{b.classList.remove('copied');b.innerHTML='<svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px"><rect x="4" y="4" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 4V3a1 1 0 00-1-1H2a1 1 0 00-1 1v7a1 1 0 001 1h1" stroke="currentColor" stroke-width="1.2"/></svg>Copy';},2000);
+    toast('Copied!');
+  });
+}
+
+function downloadCode(){
+  const content = document.getElementById('css-out').textContent;
+  const isCss = _modalTab === 'css';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type: isCss ? 'text/css' : 'text/html'}));
+  a.download = isCss ? 'pardot-form.css' : 'pardot-form.html';
+  a.click();
+  toast('Downloaded ' + a.download);
+}
+
+let tt;
+function toast(msg){document.getElementById('toast-msg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2400);}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+(function init(){
+  S.fields=[
+    mkF('text'),
+    {...mkF('text'),id:gid(),label:'Last Name',placeholder:'Enter your last name'},
+    mkF('email'),mkF('phone'),
+    {...mkF('select'),id:gid(),label:'How did you hear about us?',options:['Web Search','Social Media','Referral','Advertisement','Other']},
+    mkF('textarea'),
+    {...mkF('checkbox'),id:gid(),label:'I consent to receive marketing communications'},
+    mkF('submit'),
+  ];
+  render();selF(S.fields[0].id);
+})();
+</script>
+</body>
+</html>
