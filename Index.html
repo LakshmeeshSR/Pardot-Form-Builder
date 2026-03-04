@@ -1322,14 +1322,7 @@ function switchModalTab(tab){
 }
 
 function genFormCode(){
-  const css = genCSS();
-  // Strip the <style> wrapper and body snippet from the CSS output to get pure CSS
-  const styleOpen = '<style type="text/css">\n';
-  const bodySnippet = '\n<\\/body>';
-  let pureCSS = css;
-  if(pureCSS.startsWith(styleOpen)) pureCSS = pureCSS.slice(styleOpen.length);
-  const closeStyleIdx = pureCSS.lastIndexOf('</style>');
-  if(closeStyleIdx !== -1) pureCSS = pureCSS.slice(0, closeStyleIdx);
+  
 
   return `<form accept-charset="UTF-8" method="post" action="%%form-action-url%%" class="form" id="pardot-form">
 %%form-opening-general-content%%
@@ -1414,6 +1407,7 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 </body>
 
 </html>
+
 
 
 
